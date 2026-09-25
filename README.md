@@ -199,8 +199,7 @@ Total de eventos creados en el sistema: 1
 ```
 
 > 📷 **[ Acá va tu captura real de la salida completa de consola ]**
-
----
+![Parte 1](PP_TP_2_53319/Capturas/C1.png), ![Parte 2](PP_TP_2_53319/Capturas/C2.png), ![Parte 3](PP_TP_2_53319/Capturas/C3.png)---
 
 ## 📦 Pautas de entrega
 
