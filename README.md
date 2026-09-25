@@ -1,151 +1,151 @@
-# 🎓 TP2 — Sistema de Eventos Universitarios (POO escalado en Java)
+# TP2 — Sistema de Gestión de Eventos Universitarios (POO en Java)
 
-| Dato | Detalle                       |
+| Campo | Valor                         |
 |---|-------------------------------|
-| **Materia** | Paradigmas de la Programacion |
-| **Alumno** | Ten Andrés                    |
+| **Materia** | Paradigmas de la Programación |
+| **Alumno** | Gabriel Carlos                |
 | **Comisión** | 2K7                           |
-| **Repositorio** | `PP_TP2_<52142>`              |
+| **Repositorio** | `PP_TP2_<53319>`              |
 
 ---
 
-## 📌 Descripción del proyecto
+##  ¿Qué hace este proyecto?
 
-Este trabajo escala el modelo de eventos universitarios desarrollado
-previamente, modularizando el código en **packages** y agregando:
+Este trabajo toma el modelo de eventos universitarios de la entrega
+anterior y lo lleva un paso más allá: se reorganiza en **packages** y se
+incorporan cuatro capacidades nuevas.
 
-1. **Manejo de excepciones chequeadas** para tolerancia a fallos
-   (cupo excedido, cupo mínimo no alcanzado, datos inválidos) y
-   **persistencia de objetos mediante serialización** de un
-   `EventoUniversitario` a disco.
-2. **Interfaces** para modelar qué actividades son certificables
-   (`Taller` y `Curso`, pero no `Charla`) y emitir `Certificado`s.
-3. **Métodos genéricos acotados y wildcards** en `EventoUniversitario`
-   para filtrar actividades por tipo concreto y calcular el costo de
-   materiales sobre listas de cualquier subtipo de `Actividad`.
-4. **Clases anidadas e hilos**: `TicketDeAcceso` como clase miembro
-   (no estática) de `Inscripcion`, y `EnvioTicketsThread` como clase
-   independiente del paquete `hilos` que envía los tickets de forma
-   concurrente sin bloquear al hilo principal.
+1. **Excepciones chequeadas + persistencia**: el sistema tolera fallas
+   (cupo excedido, cupo mínimo no alcanzado, datos inválidos) y puede
+   guardar y recuperar un `EventoUniversitario` completo desde disco
+   mediante serialización.
+2. **Interfaces para certificación**: `Taller` y `Curso` pueden emitir
+   `Certificado`s porque implementan `Certificable`; `Charla` queda
+   afuera de esa capacidad.
+3. **Genéricos acotados y wildcards**: `EventoUniversitario` puede
+   filtrar sus actividades por subtipo concreto y calcular el costo de
+   materiales sobre cualquier lista de actividades, sin importar el
+   subtipo exacto.
+4. **Clases anidadas + concurrencia**: cada `Inscripcion` sabe generar
+   su propio `TicketDeAcceso` (clase miembro), y un hilo aparte
+   (`EnvioTicketsThread`) se encarga de despachar esos tickets sin
+   frenar la ejecución del programa principal.
 
 ---
 
-## 🗂️ Arquitectura del proyecto (packages)
+##  Cómo está organizado el código
 
-```
 src/
 ├── modelo/
-│   ├── Estudiante.java
-│   ├── Sala.java                    (agregación con EventoUniversitario)
-│   ├── Actividad.java                (abstracta)
-│   ├── Charla.java                   (extends Actividad, NO certificable)
-│   ├── Taller.java                   (extends Actividad, implements Certificable)
-│   ├── Curso.java                    (extends Actividad, implements Certificable)
-│   ├── EventoUniversitario.java      (composición con Actividad)
-│   ├── Inscripcion.java              (contiene la clase anidada TicketDeAcceso)
-│   └── Certificado.java
+│ ├── Estudiante.java
+│ ├── Sala.java (agregación con EventoUniversitario)
+│ ├── Actividad.java (abstracta)
+│ ├── Charla.java (extends Actividad, NO certificable)
+│ ├── Taller.java (extends Actividad, implements Certificable)
+│ ├── Curso.java (extends Actividad, implements Certificable)
+│ ├── EventoUniversitario.java (composición con Actividad)
+│ ├── Inscripcion.java (contiene la clase anidada TicketDeAcceso)
+│ └── Certificado.java
 ├── interfaces/
-│   └── Certificable.java
+│ └── Certificable.java
 ├── excepciones/
-│   ├── CupoExcedidoException.java
-│   ├── CupoMinimoNoAlcanzadoException.java
-│   └── DatosInvalidosException.java
+│ ├── CupoExcedidoException.java
+│ ├── CupoMinimoNoAlcanzadoException.java
+│ └── DatosInvalidosException.java
 ├── persistencia/
-│   └── GestorPersistencia.java       (serialización/deserialización)
+│ └── GestorPersistencia.java (serialización/deserialización)
 ├── hilos/
-│   └── EnvioTicketsThread.java       (Runnable, envío concurrente de tickets)
+│ └── EnvioTicketsThread.java (Runnable, envío concurrente de tickets)
 └── app/
-    └── App.java                      (main)
-```
+└── App.java (main)
 
-### Relaciones del modelo
 
-- **Composición**: `EventoUniversitario` ↔ `Actividad` (las actividades no
-  existen fuera del evento que las contiene; se crean con
-  `evento.crearActividad(...)`).
-- **Agregación**: `EventoUniversitario` ↔ `Sala` (la sala existe
-  independientemente del evento al que se le asigna).
-- **Asociación**: `Actividad` ↔ `Estudiante` a través de `Inscripcion`.
-- **Herencia**: `Charla`, `Taller` y `Curso` extienden `Actividad`.
-- **Clase anidada miembro**: `Inscripcion.TicketDeAcceso` (no estática,
-  requiere la referencia implícita `Inscripcion.this` para saber a qué
-  estudiante y actividad pertenece el ticket).
+### Vínculos entre las clases
+
+- **Composición**: un `EventoUniversitario` es dueño de sus
+  `Actividad`; no tiene sentido que una actividad exista fuera de un
+  evento (se crean vía `evento.crearActividad(...)`).
+- **Agregación**: la `Sala` puede existir sin el evento — solo se le
+  asigna.
+- **Asociación**: `Estudiante` y `Actividad` se vinculan a través de
+  `Inscripcion`.
+- **Herencia**: `Charla`, `Taller` y `Curso` heredan de `Actividad`.
+- **Clase anidada miembro**: `Inscripcion.TicketDeAcceso` no es
+  estática, así que necesita la referencia implícita
+  `Inscripcion.this` para saber de qué estudiante y actividad es el
+  ticket.
 
 ---
 
-## ⚙️ Detalle por ejercicio
+##  Qué resuelve cada ejercicio
 
 ### Ejercicio 1 — Excepciones y persistencia
-- `Actividad.inscribir(Estudiante)` lanza `CupoExcedidoException`
-  (chequeada) cuando ya se alcanzó el cupo máximo.
-- `Actividad.cerrarInscripciones()` lanza `CupoMinimoNoAlcanzadoException`
-  (chequeada) si no se llegó al cupo mínimo.
-- Los constructores del modelo lanzan `DatosInvalidosException`
-  (chequeada) ante datos nulos/vacíos/fuera de rango.
-- `GestorPersistencia` serializa y deserializa un `EventoUniversitario`
-  completo (incluye su sala, actividades e inscripciones).
-- En `App` se implementa un flujo `try-catch-finally` que intenta
-  inscribir, persistir y leer el evento, capturando de forma granular
+- `Actividad.inscribir(Estudiante)` tira `CupoExcedidoException` si ya
+  no hay lugar.
+- `Actividad.cerrarInscripciones()` tira
+  `CupoMinimoNoAlcanzadoException` si no se llegó al mínimo requerido.
+- Los constructores del modelo validan sus parámetros y lanzan
+  `DatosInvalidosException` ante datos nulos, vacíos o fuera de rango.
+- `GestorPersistencia` guarda y recupera un `EventoUniversitario`
+  entero (sala, actividades e inscripciones incluidas).
+- `App` encadena un `try-catch-finally` que inscribe, persiste y
+  vuelve a leer el evento, atrapando por separado
   `CupoExcedidoException`, `CupoMinimoNoAlcanzadoException`,
-  `FileNotFoundException`, `IOException` y `ClassNotFoundException`,
-  cada una con su mensaje propio.
+  `FileNotFoundException`, `IOException` y `ClassNotFoundException`.
 
 ### Ejercicio 2 — Interfaces y certificados
-- `Certificable` declara `emitirCertificado(Estudiante)`.
-- La implementan `Taller` y `Curso`; `Charla` **no** la implementa.
-- En `App` se recorren las actividades del evento y, mediante
-  `instanceof Certificable`, se emiten certificados solo a los
-  inscriptos de actividades certificables.
+- `Certificable` define el método `emitirCertificado(Estudiante)`.
+- Solo `Taller` y `Curso` la implementan; `Charla` queda fuera a
+  propósito.
+- `App` recorre las actividades y, con `instanceof Certificable`,
+  emite certificados únicamente a quienes se inscribieron en
+  actividades certificables.
 
 ### Ejercicio 3 — Genéricos acotados y wildcards
-- `public <T extends Actividad> List<T> filtrarActividadesPorTipo(Class<T> tipo)`
-  devuelve listas correctamente tipadas (`List<Charla>`, `List<Taller>`,
+- `<T extends Actividad> List<T> filtrarActividadesPorTipo(Class<T> tipo)`
+  devuelve listas ya tipadas (`List<Charla>`, `List<Taller>`,
   `List<Curso>`).
-- `public double calcularCostoMateriales(List<? extends Actividad> actividades)`
-  opera sobre cualquier lista de `Actividad` o subtipos.
+- `double calcularCostoMateriales(List<? extends Actividad> actividades)`
+  funciona sobre cualquier lista de `Actividad` o de sus subtipos.
 
 ### Ejercicio 4 — Clases anidadas e hilos
-- `Inscripcion.TicketDeAcceso` es una clase miembro (no estática): un
-  ticket solo tiene sentido dentro del contexto de una inscripción
-  confirmada concreta.
-- `EnvioTicketsThread` (paquete `hilos`) implementa `Runnable` y envía,
-  con una demora simulada, todos los tickets de las inscripciones
+- `Inscripcion.TicketDeAcceso` es miembro (no estática): un ticket solo
+  tiene sentido dentro de una inscripción confirmada concreta.
+- `EnvioTicketsThread` (package `hilos`) implementa `Runnable` y
+  despacha, con una demora simulada, los tickets de las inscripciones
   confirmadas.
-- En `App`, el hilo principal inicia `EnvioTicketsThread` en un hilo
-  separado y continúa mostrando los datos del evento, sus actividades e
-  inscriptos mientras el envío ocurre en paralelo — evidenciando en
-  consola los nombres de ambos hilos.
+- En `App`, el hilo principal lanza `EnvioTicketsThread` en paralelo y
+  sigue mostrando la info del evento mientras el envío ocurre al mismo
+  tiempo — se ve en consola el nombre de ambos hilos trabajando.
 
 ---
 
-## ▶️ Cómo ejecutar
+##  Ejecución
 
-**Desde línea de comandos** (parado en la carpeta `src`):
+**Por línea de comandos** (parado en `src`):
 ```bash
 cd src
 javac app/App.java modelo/*.java interfaces/*.java excepciones/*.java persistencia/*.java hilos/*.java
 java app.App
 ```
 
-**Desde IntelliJ IDEA**: abrir el proyecto (`File > Open`), marcar `src`
-como *Sources Root* si no lo detecta automáticamente, y ejecutar
-`app.App` (clic derecho → `Run 'App.main()'`).
+**Desde IntelliJ IDEA**: abrir el proyecto (`File > Open`), marcar
+`src` como *Sources Root* si no lo detecta solo, y correr `app.App`
+(clic derecho → `Run 'App.main()'`).
 
-Al ejecutarse, el programa genera un archivo `evento1.dat` en el
-directorio de trabajo (evidencia de la persistencia por serialización).
+Cada ejecución genera un archivo `evento1.dat` en el directorio de
+trabajo — es la evidencia de que la persistencia por serialización
+funciona.
 
 ---
 
-## 🖥️ Consola (salida esperada, resumida)
+##  Salida por consola (resumida)
 
-> ⚠️ Los códigos de ticket y el orden exacto de algunas líneas del hilo
-> de envío pueden variar levemente entre ejecuciones — es normal en un
-> programa concurrente. Reemplazar este bloque por tu captura real.
-
-```
+> ⚠️ Los códigos de ticket y el orden exacto de algunas líneas del
+> envío pueden variar levemente entre corridas — es esperable en un
+> programa concurrente. Reemplazar este bloque por la captura real.
 ==================================================
-   TP2 - SISTEMA DE EVENTOS UNIVERSITARIOS (escalado)
-==================================================
+TP2 - SISTEMA DE EVENTOS UNIVERSITARIOS (escalado)
 
 ----- Validación de datos -----
 ⚠ No se pudo crear el estudiante: El legajo del estudiante no puede ser nulo ni vacío.
@@ -164,14 +164,14 @@ Proceso de cierre del Taller de repaso finalizado.
 ----- Persistencia del evento -----
 ✔ Evento persistido correctamente en "evento1.dat".
 ✔ Evento recuperado desde archivo:
-  Comisión: 2K7
-  ...
+Comisión: 2K7
+...
 Proceso de persistencia finalizado.
 
 ----- EJERCICIO 2: Emisión de certificados -----
 Certificados emitidos: 5 (solo Talleres y Cursos; las Charlas no son certificables)
-  🏅 Certificado (Taller) - Matemática introductoria | Estudiante: Pablo | ...
-  ...
+ Certificado (Taller) - Matemática introductoria | Estudiante: Pablo | ...
+...
 
 ----- EJERCICIO 3: Filtrado por tipo y costo de materiales -----
 Cantidad de Charlas: 1
@@ -183,33 +183,31 @@ Costo de materiales - Cursos: $2000.00
 
 ----- EJERCICIO 4: Tickets de acceso concurrentes -----
 Inscripciones confirmadas con ticket emitido: 4
-  🎫 Ticket TCK-101-... | Estudiante: Pablo | Actividad: Electrónica básica | ...
-  ...
+ Ticket TCK-101-... | Estudiante: Pablo | Actividad: Electrónica básica | ...
+...
 
 [main] Continúo mostrando información del evento mientras el otro hilo envía los tickets:
-  ...
-  [Hilo-EnvioTickets] Iniciando envío de 4 ticket(s) de acceso...
-  [Hilo-EnvioTickets] Enviado ticket TCK-101-... a Pablo
-  ...
+...
+[Hilo-EnvioTickets] Iniciando envío de 4 ticket(s) de acceso...
+[Hilo-EnvioTickets] Enviado ticket TCK-101-... a Pablo
+...
 [main] Envío de tickets finalizado. Se evidenciaron dos hilos de ejecución distintos.
 
 ==================================================
 Total de eventos creados en el sistema: 1
-==================================================
-```
 
-> 📷 **[ Acá va tu captura real de la salida completa de consola ]**
-![Parte 1](PP_TP_2_53319/Capturas/C1.png), ![Parte 2](PP_TP_2_53319/Capturas/C2.png), ![Parte 3](PP_TP_2_53319/Capturas/C3.png)---
+![Parte 1](PP_TP_2_53319/Capturas/C1.png), ![Parte 2](PP_TP_2_53319/Capturas/C2.png), ![Parte 3](PP_TP_2_53319/Capturas/C3.png)
 
-## 📦 Pautas de entrega
+---
 
-1. Crear un repositorio en **GitHub**, de acceso **público**, llamado
+## 📦 Cómo se entrega este trabajo
+
+1. Crear un repositorio **público** en GitHub llamado
    `PP_TP2_<tu_legajo>` (ej: `https://github.com/tu_usuario/PP_TP2_50268`).
-2. El repositorio debe contener:
-   - El proyecto de código completo (hasta el Ejercicio 4), generado
-     desde **IntelliJ IDEA**, listo para clonar y ejecutar.
-   - Este `README.md` con la documentación del proyecto.
-   - Una **captura de pantalla** de la salida por consola de una
-     ejecución completa del programa.
-3. Consignar en la entrega la **URL de clonado vía https** del
-   repositorio, en el enlace "Entregar Trabajo Práctico N.º 2".
+2. Ese repositorio debe incluir:
+    - El proyecto completo (hasta el Ejercicio 4), tal como lo generó
+      IntelliJ IDEA, listo para clonar y correr.
+    - Este mismo `README.md` documentando el trabajo.
+    - Una **captura de pantalla** de una ejecución completa por consola.
+3. Entregar la **URL de clonado por https** del repositorio en el
+   enlace "Entregar Trabajo Práctico N.º 2".
