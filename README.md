@@ -146,55 +146,117 @@ funciona.
 > programa concurrente. Reemplazar este bloque por la captura real.
 ==================================================
 TP2 - SISTEMA DE EVENTOS UNIVERSITARIOS (escalado)
+==================================================
 
 ----- Validación de datos -----
-⚠ No se pudo crear el estudiante: El legajo del estudiante no puede ser nulo ni vacío.
+⚠ No se pudo crear el estudiante: El legajo del estudiante no puede ser nulo ni vacio.
 
 ----- EJERCICIO 1: Inscripciones con control de cupo -----
-✔ Inscripciones a la Charla realizadas con éxito (cupo 2/2).
-⚠ No se pudo inscribir en la Charla: Cupo excedido en "Electrónica básica" (cupo máximo: 2).
+✓ Inscripciones a la Charla realizadas con éxito (cupo 2/2).
+⚠ No se pudo inscribir en la Charla: Cupo excedido en "Introducción a Redes" (cupo máximo: 2).
 Proceso de inscripción a la Charla finalizado.
-✔ Inscripciones al Taller realizadas con éxito.
+✓ Inscripciones al Taller realizadas con éxito.
 Proceso de inscripción al Taller finalizado.
-✔ Inscripciones al Curso realizadas con éxito.
+✓ Inscripciones al Curso realizadas con éxito.
 Proceso de inscripción al Curso finalizado.
 ⚠ No se pudo cerrar inscripciones: "Taller de repaso" no alcanzó el cupo mínimo (3). Inscriptos actuales: 1.
 Proceso de cierre del Taller de repaso finalizado.
 
 ----- Persistencia del evento -----
-✔ Evento persistido correctamente en "evento1.dat".
-✔ Evento recuperado desde archivo:
+✓ Evento persistido correctamente en "evento1.dat".
+✓ Evento recuperado desde archivo:
 Comisión: 2K7
-...
+Temática: Bases de Datos II
+Costo: $2200.0
+Sala asignada: LIB (N° 5)
+Cantidad de actividades: 4
 Proceso de persistencia finalizado.
 
 ----- EJERCICIO 2: Emisión de certificados -----
 Certificados emitidos: 5 (solo Talleres y Cursos; las Charlas no son certificables)
- Certificado (Taller) - Matemática introductoria | Estudiante: Pablo | ...
-...
+🏅 Certificado (Taller) - Programación en Python | Estudiante: Lucía | Emitido: Fri Sep 25 17:15:45 ART 2026
+🏅 Certificado (Taller) - Programación en Python | Estudiante: Gonzalo | Emitido: Fri Sep 25 17:15:45 ART 2026
+🏅 Certificado (Curso) - Curso de POO avanzada | Estudiante: Martina | Emitido: Fri Sep 25 17:15:45 ART 2026
+🏅 Certificado (Curso) - Curso de POO avanzada | Estudiante: Gonzalo | Emitido: Fri Sep 25 17:15:45 ART 2026
+🏅 Certificado (Taller) - Taller de repaso | Estudiante: Lucía | Emitido: Fri Sep 25 17:15:45 ART 2026
 
 ----- EJERCICIO 3: Filtrado por tipo y costo de materiales -----
+
 Cantidad de Charlas: 1
+
 Cantidad de Talleres: 2
+
 Cantidad de Cursos: 1
-Costo de materiales - Charlas: $500.00
-Costo de materiales - Talleres: $2000.00
-Costo de materiales - Cursos: $2000.00
+
+Costo de materiales - Charlas: $500,00
+
+Costo de materiales - Talleres: $2000,00
+
+Costo de materiales - Cursos: $2000,00
 
 ----- EJERCICIO 4: Tickets de acceso concurrentes -----
 Inscripciones confirmadas con ticket emitido: 4
- Ticket TCK-101-... | Estudiante: Pablo | Actividad: Electrónica básica | ...
-...
+
+🎫 Ticket TCK-201-60318-249379123882200 | Estudiante: Lucía | Actividad: Introducción a Redes | Emitido: Fri Sep 25 17:15:45 ART 2026
+
+🎫 Ticket TCK-202-60318-249379132145600 | Estudiante: Lucía | Actividad: Programación en Python | Emitido: Fri Sep 25 17:15:45 ART 2026
+
+🎫 Ticket TCK-103-59904-249379132159000 | Estudiante: Martina | Actividad: Curso de POO avanzada | Emitido: Fri Sep 25 17:15:45 ART 2026
+
+🎫 Ticket TCK-104-60318-249379132167400 | Estudiante: Lucía | Actividad: Taller de repaso | Emitido: Fri Sep 25 17:15:45 ART 2026
 
 [main] Continúo mostrando información del evento mientras el otro hilo envía los tickets:
-...
+
+Comisión: 2K7
+
+Temática: Bases de Datos II
+
+Costo: $2200.0
+
+Sala asignada: LIB (N° 5)
+
+Cantidad de actividades: 4
+
+[Charla] Introducción a Redes (ID: 201 | Cupo: 2 | CupoMín: 1 | CostoMat: $500,00 | Inscriptos: 2)
+
+-> Inscripto: Lucía (Legajo: 60318)
+
+-> Inscripto: Martina (Legajo: 59904)
+
+[Taller] Programación en Python (ID: 202 | Cupo: 2 | CupoMín: 1 | CostoMat: $1200,00 | Inscriptos: 2)
+
+-> Inscripto: Lucía (Legajo: 60318)
+
+-> Inscripto: Gonzalo (Legajo: 61027)
+
+[Curso] Curso de POO avanzada (ID: 103 | Cupo: 3 | CupoMín: 1 | CostoMat: $2000,00 | Inscriptos: 2)
+
+-> Inscripto: Martina (Legajo: 59904)
+
+-> Inscripto: Gonzalo (Legajo: 61027)
+
+[Taller] Taller de repaso (ID: 104 | Cupo: 5 | CupoMín: 3 | CostoMat: $800,00 | Inscriptos: 1)
+
+-> Inscripto: Lucía (Legajo: 60318)
+
 [Hilo-EnvioTickets] Iniciando envío de 4 ticket(s) de acceso...
-[Hilo-EnvioTickets] Enviado ticket TCK-101-... a Pablo
-...
+
+[Hilo-EnvioTickets] Enviado ticket TCK-201-60318-249379123882200 a Lucía
+
+[Hilo-EnvioTickets] Enviado ticket TCK-202-60318-249379132145600 a Lucía
+
+[Hilo-EnvioTickets] Enviado ticket TCK-103-59904-249379132159000 a Martina
+
+[Hilo-EnvioTickets] Enviado ticket TCK-104-60318-249379132167400 a Lucía
+
+[Hilo-EnvioTickets] Envío de tickets finalizado.
 [main] Envío de tickets finalizado. Se evidenciaron dos hilos de ejecución distintos.
 
 ==================================================
 Total de eventos creados en el sistema: 1
+==================================================
+
+Process finished with exit code 0
 
 ![Parte 1](PP_TP_2_53319/Capturas/C1.png), ![Parte 2](PP_TP_2_53319/Capturas/C2.png), ![Parte 3](PP_TP_2_53319/Capturas/C3.png)
 
